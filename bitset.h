@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 typedef unsigned long * bitset_t; // type of bit array
 
@@ -36,3 +37,12 @@ typedef unsigned long bitset_index_t;
     (jmeno_pole)[0] = ((unsigned long) velikost); \
  } while (0)
 
+
+ #define bitset_free(jmeno_pole) free(jmeno_pole);
+
+ #define bitset_size(jmeno_pole) (jmeno_pole)[0]
+
+ #define bitset_fill(jmeno_pole, bool_vyraz) \
+   if (bool_vzraz) 
+
+ 
