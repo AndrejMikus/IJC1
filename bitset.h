@@ -59,11 +59,11 @@ typedef unsigned long bitset_index_t;
  /* ================================================== */
 /* inspired from https://www.cs.yale.edu/homes/aspnes/classes/223/notes.html#bitManipulation */
  #define bitset_setbit(jmeno_pole, index, bool_vyraz) \
-   if (bool_vyraz) { ((jmeno_pole)[1 + ((index) / BITS_PER_ULONG)]) |= (0x1 << ((index) % BITS_PER_ULONG)); } \
-   else { ((jmeno_pole)[1 + ((index) / BITS_PER_ULONG)]) &= ~(0x1 << ((index) % BITS_PER_ULONG)); }
+   if (bool_vyraz) { ((jmeno_pole)[1 + ((index) / BITS_PER_ULONG)]) |= (1UL << ((index) % BITS_PER_ULONG)); } \
+   else { ((jmeno_pole)[1 + ((index) / BITS_PER_ULONG)]) &= ~(1UL << ((index) % BITS_PER_ULONG)); }
 
 
 #define bitset_getbit(jmeno_pole, index) \
-   ((( (jmeno_pole)[1 + ((index) / BITS_PER_ULONG)] ) & (0x1 << ((index) % BITS_PER_ULONG))) != 0)
+   ((( (jmeno_pole)[1 + ((index) / BITS_PER_ULONG)] ) & (1UL << ((index) % BITS_PER_ULONG))) != 0)
 
 /* ================================================== */
