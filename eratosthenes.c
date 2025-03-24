@@ -2,7 +2,6 @@
 #include <math.h>
 #include <stdio.h>
 
-#define LIMIT 333000000
 
 void Eratosthenes(bitset_t pole) {
 
@@ -11,12 +10,12 @@ void Eratosthenes(bitset_t pole) {
     bitset_setbit(pole, 1, 0); // p[1] = 0
 
     bitset_index_t sq_root = sqrt(bitset_size(pole));
-
+    bitset_index_t size_btst = bitset_size(pole);
     
     for (bitset_index_t i = 2; i <= sq_root; i++) {
         
         if(bitset_getbit(pole, i)) {
-            for (bitset_index_t n = i * i; n < LIMIT; n += i) {
+            for (bitset_index_t n = i * i; n < size_btst; n += i) {
                 bitset_setbit(pole, n, 0);
             }
         }
