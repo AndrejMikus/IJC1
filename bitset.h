@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include "error.h"
 
 typedef unsigned long * bitset_t; // type of bit array
 
@@ -31,10 +32,10 @@ typedef unsigned long bitset_index_t;
 
  /* malloc allocates memory only in full bytes (CHAR_BITS)*/
  #define bitset_alloc(jmeno_pole, velikost) do { \
-   static_assert((velikost) > 0, "Error: size of array must be positive");\
-   static_assert((velikost) <= ULONG_MAX, "Error: size of array exceeded"); \
+   assert((velikost) > 0 && "Error: size of array must be positive");\
+   assert((velikost) <= ULONG_MAX && "Error: size of array exceeded"); \
     (jmeno_pole) = calloc(arr_size_from_bits((velikost)) + 1, sizeof(unsigned long)); \
-    if (!(jmeno_pole)) { fprintf(stderr, "bitset_alloc: Chyba alokace paměti\n"); exit(1); } \
+    if (!(jmeno_pole)) { error_exit("bitset_alloc: Chyba alokace paměti"); } \
     (jmeno_pole)[0] = ((unsigned long) velikost); \
  } while (0)
 
@@ -58,12 +59,32 @@ typedef unsigned long bitset_index_t;
 
  /* ================================================== */
 /* inspired from https://www.cs.yale.edu/homes/aspnes/classes/223/notes.html#bitManipulation */
- #define bitset_setbit(jmeno_pole, index, bool_vyraz) \
-   if (bool_vyraz) { ((jmeno_pole)[1 + ((index) / BITS_PER_ULONG)]) |= (1UL << ((index) % BITS_PER_ULONG)); } \
-   else { ((jmeno_pole)[1 + ((index) / BITS_PER_ULONG)]) &= ~(1UL << ((index) % BITS_PER_ULONG)); }
+#define bitset_setbit(jmeno_pole, index, bool_vyraz) do { \
+   if ((index) >= (bitset_size(jmeno_pole))) { \
+       error_exit("bitset_setbit: Index %lu mimo rozsah 0..%lu", \
+           (unsigned long)(index), (unsigned long)(bitset_size(jmeno_pole))); \
+   } \
+   if (bool_vyraz) { \
+       ((jmeno_pole)[1 + ((index) / BITS_PER_ULONG)]) |= (1UL << ((index) % BITS_PER_ULONG)); \
+   } else { \
+       ((jmeno_pole)[1 + ((index) / BITS_PER_ULONG)]) &= ~(1UL << ((index) % BITS_PER_ULONG)); \
+   } \
+} while (0)
+
 
 
 #define bitset_getbit(jmeno_pole, index) \
-   ((( (jmeno_pole)[1 + ((index) / BITS_PER_ULONG)] ) & (1UL << ((index) % BITS_PER_ULONG))) != 0)
+((index) >= (bitset_size(jmeno_pole)) ? \
+      (error_exit("bitset_getbit: Index %lu mimo rozsah 0..%lu", \
+         (unsigned long)(index), (unsigned long)(bitset_size(jmeno_pole))), 0) : \
+      ((( (jmeno_pole)[1 + ((index) / BITS_PER_ULONG)] ) & (1UL << ((index) % BITS_PER_ULONG))) != 0))
+
 
 /* ================================================== */
+
+inline void bitset_free(bitset_t *pole) { free(pole); }
+
+inline bitset_index_t bitset_size(bitset_t jmeno_pole) { return jmeno_pole[0]; }
+
+
+
