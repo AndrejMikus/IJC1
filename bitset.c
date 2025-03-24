@@ -1,7 +1,5 @@
 #include "bitset.h"
 
+extern void bitset_free(bitset_t *pole);
 
-
-int main(void) {
-    bitset_t bitset_create()
-}
+extern bitset_index_t bitset_size(bitset_t jmeno_pole);
