@@ -1,13 +1,29 @@
 CC=gcc
 CFLAGS=-std=c11 -Wall -Wextra -pedantic -O2
+LDFLAGS=-lm
 
-all: bitset_test
+all: primes steg-decode
 
-bitset_test: bitset.o
-	$(CC) $(CFLAGS) -o bitset_test bitset.o
+primes: primes.o error.o
+	$(CC) $(CFLAGS) -o primes primes.o error.o $(LDFLAGS)
 
-bitset.o: bitset.c bitset.h
-	$(CC) $(CFLAGS) -c bitset.c -o bitset.o
+primes.o: primes.c bitset.h error.h
+	$(CC) $(CFLAGS) -c primes.c -o primes.o
+
+eratosthenes.o: eratosthenes.c
+	$(CC) $(CFLAGS) -c eratosthenes.c -o eratosthenes.o
+
+steg-decode: steg-decode.o ppm.o error.o
+	$(CC) $(CFLAGS) -o steg-decode steg-decode.o ppm.o error.o $(LDFLAGS)
+
+steg-decode.o: steg-decode.c ppm.h error.h
+	$(CC) $(CFLAGS) -c steg-decode.c -o steg-decode.o
+
+ppm.o: ppm.c ppm.h error.h
+	$(CC) $(CFLAGS) -c ppm.c -o ppm.o
+
+error.o: error.c error.h
+	$(CC) $(CFLAGS) -c error.c -o error.o
 
 clean:
-	rm -f bitset_test bitset.o
+	rm -f primes steg-decode *.o
