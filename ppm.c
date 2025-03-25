@@ -1,3 +1,9 @@
+// ppm.c
+// Reseni IJC-DU1, priklad b), 17.3.2025
+// Autor: Andrej Mikus, FIT
+// Prelozeno: gcc (GCC) 14.2.1
+// nacita subor ppm a vlozi ho do struktury
+
 #include "error.h"
 #include "ppm.h"
 #include <ctype.h>
@@ -7,6 +13,7 @@
 
 #define BUFFER 8
 
+/* peeks next character: get and unget it */
 int peek_c(FILE *f) {
     int c;
     c = fgetc(f);
@@ -15,6 +22,7 @@ int peek_c(FILE *f) {
     return c;
 }
 
+/* reads int number */
 unsigned read_num(FILE *f) {
     int c;
     unsigned num = 0;
@@ -28,6 +36,7 @@ unsigned read_num(FILE *f) {
     return num;
 }
 
+/* returns lenght of whitespace sequence */
 int read_ws(FILE *f) {
     int ws_count = 0;
     int c;
@@ -53,68 +62,79 @@ struct ppm * ppm_read(const char * filename) {
         return NULL;
     }
 
-    
+    /* check file validity */
     fgets(variant, sizeof(variant), file);
     if (strcmp(variant, "P6") != 0) {
         warning("invalid PPM format\n");
+        fclose(file);
         return NULL;
     }
 
     if (read_ws(file) == 0) {
         warning("invalid PPM format\n");
+        fclose(file);
         return NULL;
     }
 
     if ((x_size = read_num(file)) == 0) {
         warning("invalid PPM format\n");
+        fclose(file);
         return NULL;
     }
 
     if (read_ws(file) == 0) {
         warning("invalid PPM format\n");
+        fclose(file);
         return NULL;
     }
 
     if ((y_size = read_num(file)) == 0) {
         warning("invalid PPM format\n");
+        fclose(file);
         return NULL;
     }
 
     if (read_ws(file) == 0) {
         warning("invalid PPM format\n");
+        fclose(file);
         return NULL;
     }
 
     if ((max_val = read_num(file)) != 255) {
         warning("invalid PPM format\n");
+        fclose(file);
         return NULL;
     }
 
     if (read_ws(file) != 1) {
         warning("invalid PPM format\n");
+        fclose(file);
         return NULL;
     }
     
+    /* malloc structure */
     int image_size = 3 * x_size * y_size;
     struct ppm *image = malloc(image_size + sizeof(struct ppm));
     if (image == NULL) {
         warning("memory allocation failed\n");
+        fclose(file);
         return NULL;
     }
     
     image->xsize = x_size;
     image->ysize = y_size;
     
-
+    /* read the file into the structure */
     bytes_read = fread(image->data, 1, image_size, file);
-    fclose(file);
+    
     if (bytes_read != image_size) {
         warning("invalid PPM format\n");
+        fclose(file);
         return NULL;
     }
 
 
-    
+    fclose(file);
 
     return image;
 }

@@ -1,29 +1,48 @@
+# Makefile
+# Reseni IJC-DU1, priklad a), b), 17.3.2025
+# Autor: Andrej Mikus, FIT
+# Prelozeno: gcc (GCC) 14.2.1
+#
+
 CC=gcc
-CFLAGS=-std=c11 -Wall -Wextra -pedantic -O2
+CFLAGS=-std=c11 -g -Wall -Wextra -pedantic -O2
 LDFLAGS=-lm
+INL_FLAGS = -DUSE_INLINE
 
-all: primes steg-decode
 
-primes: primes.o error.o
-	$(CC) $(CFLAGS) -o primes primes.o error.o $(LDFLAGS)
+TARGS = primes primes-i steg-decode
 
-primes.o: primes.c bitset.h error.h
-	$(CC) $(CFLAGS) -c primes.c -o primes.o
+LIBS = bitset.h eratosthenes.h error.h ppm.h
 
-eratosthenes.o: eratosthenes.c
-	$(CC) $(CFLAGS) -c eratosthenes.c -o eratosthenes.o
+O_STEG = bitset.o eratosthenes.o ppm.o steg-decode.o error.o
+O_PRIMES = bitset.o eratosthenes.o primes.o error.o
+O_PRIMES_I = bitset-i.o eratosthenes.o primes-i.o error.o
 
-steg-decode: steg-decode.o ppm.o error.o
-	$(CC) $(CFLAGS) -o steg-decode steg-decode.o ppm.o error.o $(LDFLAGS)
+all: $(TARGS)
 
-steg-decode.o: steg-decode.c ppm.h error.h
-	$(CC) $(CFLAGS) -c steg-decode.c -o steg-decode.o
+primes: $(O_PRIMES)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-ppm.o: ppm.c ppm.h error.h
-	$(CC) $(CFLAGS) -c ppm.c -o ppm.o
+primes-i: $(O_PRIMES_I)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-error.o: error.c error.h
-	$(CC) $(CFLAGS) -c error.c -o error.o
+steg-decode: $(O_STEG)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+%.o: %.c $(LIBS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+primes-i.o: primes.c $(LIBS)
+	$(CC) $(CFLAGS) $(INL_FLAGS) -c $< -o $@
+
+bitset-i.o: bitset.c bitset.h
+	$(CC) $(CFLAGS) $(INL_FLAGS) -c $< -o $@
+
+run: all
+	ulimit -s 120000 && ./primes && ./primes-i
 
 clean:
-	rm -f primes steg-decode *.o
+	rm -f *.o $(TARGS) xmikus19.zip
+
+zip:
+	zip xmikus19.zip *.c *.h Makefile

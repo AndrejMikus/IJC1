@@ -1,4 +1,11 @@
+// eratosthenes.c
+// Reseni IJC-DU1, priklad a), 17.3.2025
+// Autor: Andrej Mikus, FIT
+// Prelozeno: gcc (GCC) 14.2.1
+// Eratosthenovo sito
+
 #include "bitset.h"
+#include "eratosthenes.h"
 #include <math.h>
 #include <stdio.h>
 
